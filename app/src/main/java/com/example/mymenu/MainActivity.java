@@ -10,16 +10,46 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
-    Intent intent;
+    Intent signUp, viewName, about;
+
+    Button btnSignUp,  btnSearchByName, btnAbout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btnSignUp = findViewById(R.id.btnSignUp);
+        btnSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signUp = new Intent(MainActivity.this, SignupActivity.class);
+                startActivity(signUp);
+            }
+        });
+
+        btnSearchByName = findViewById(R.id.btnSearchByName);
+        btnSearchByName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewName = new Intent(MainActivity.this, ViewName.class);
+                startActivity(viewName);
+            }
+        });
+
+        btnAbout = findViewById(R.id.btnAbout);
+        btnAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                about = new Intent(MainActivity.this, About.class);
+                startActivity(about);
+            }
+        });
     }
 
     @SuppressLint("RestrictedApi")
@@ -48,10 +78,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onClick(View view) {
-        intent = new Intent(this, SignupActivity.class);
-        startActivity(intent);
     }
 }

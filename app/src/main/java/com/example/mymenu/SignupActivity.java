@@ -35,10 +35,11 @@ public class SignupActivity extends AppCompatActivity {
         btnInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean isInserted = myDb.insertData(name.getText().toString(),
+                boolean isInserted = myDb.insertData(
+                        etId.getText().toString(),
+                        name.getText().toString(),
                         surname.getText().toString(),
                         email.getText().toString(),
-                        etId.getText().toString(),
                         etPhone.getText().toString());
 
                 if (isInserted == true)
@@ -72,7 +73,9 @@ public class SignupActivity extends AppCompatActivity {
                     buffer.append("ID: " + res.getString(0) + "\n");
                     buffer.append("NAME: " + res.getString(1) + "\n");
                     buffer.append("SURNAME: " + res.getString(2) + "\n");
-                    buffer.append("EMAIL: " + res.getString(3) + "\n\n");
+                    buffer.append("EMAIL: " + res.getString(3) + "\n");
+                    buffer.append("PHONE_num: " + res.getString(4) + "\n\n");
+
 
                 }
                 showData("Data", buffer.toString());
@@ -85,7 +88,8 @@ public class SignupActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                boolean isUpdated = myDb.updateData(etId.getText().toString(),
+                boolean isUpdated = myDb.updateData(
+                        etId.getText().toString(),
                         name.getText().toString(),
                         surname.getText().toString(),
                         email.getText().toString(),

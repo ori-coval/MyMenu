@@ -1,37 +1,47 @@
-package com.example.mymenu;
+package com.example.mymenu.SignUpSignIn;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-public class SignupActivity extends AppCompatActivity {
-    Intent in;
+import com.example.mymenu.DatabaseHelper;
+import com.example.mymenu.R;
+
+public class SignUpFragment extends Fragment {
     DatabaseHelper myDb;
     EditText name, surname, email, etId, etPhone;
-    Button btnInsert,btnView,btnUpdate,btnDelete;
+    Button btnInsert, btnView, btnUpdate, btnDelete;
+
+    public SignUpFragment() {
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.sign_up);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.sign_up, container, false);
 
-        in = getIntent();
+        myDb = new DatabaseHelper(getActivity());
 
-        myDb = new DatabaseHelper(this);
+        name = view.findViewById(R.id.etName);
+        surname = view.findViewById(R.id.etSure);
+        etId = view.findViewById(R.id.etId);
+        email = view.findViewById(R.id.etMail);
+        etPhone = view.findViewById(R.id.etPhone);
 
-        name = findViewById(R.id.etName);
-        surname = findViewById(R.id.etSure);
-        etId = findViewById(R.id.etId);
-        email = findViewById(R.id.etMail);
-        etPhone = findViewById(R.id.etPhone);
+        btnInsert = view.findViewById(R.id.btnInsert);
+        btnView = view.findViewById(R.id.btnView);
+        btnUpdate = view.findViewById(R.id.btnUpdate);
+        btnDelete = view.findViewById(R.id.btnDelete);
 
-        btnInsert = findViewById(R.id.btnInsert);
         btnInsert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,29 +52,25 @@ public class SignupActivity extends AppCompatActivity {
                         email.getText().toString(),
                         etPhone.getText().toString());
 
-                if (isInserted == true)
-                    Toast.makeText(SignupActivity.this, "Data Inserted",
-                            Toast.LENGTH_LONG).show();
-                else
-                    Toast.makeText(SignupActivity.this, "Data not Inserted",
-                            Toast.LENGTH_LONG).show();
+                if (isInserted) {
+                    Toast.makeText(getActivity(), "Data Inserted", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(), "Data not Inserted", Toast.LENGTH_LONG).show();
+                }
+
                 etId.setText("");
                 name.setText("");
                 surname.setText("");
                 email.setText("");
                 etPhone.setText("");
-
             }
         });
 
-        btnView = findViewById(R.id.btnView);
         btnView.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 Cursor res = myDb.getAllData();
                 if (res.getCount() == 0) {
-                    //show message
                     showData("Error", "No Data Found");
                     return;
                 }
@@ -75,17 +81,12 @@ public class SignupActivity extends AppCompatActivity {
                     buffer.append("SURNAME: " + res.getString(2) + "\n");
                     buffer.append("EMAIL: " + res.getString(3) + "\n");
                     buffer.append("PHONE_num: " + res.getString(4) + "\n\n");
-
-
                 }
                 showData("Data", buffer.toString());
             }
         });
 
-        btnUpdate = findViewById(R.id.btnUpdate);
         btnUpdate.setOnClickListener(new View.OnClickListener() {
-
-
             @Override
             public void onClick(View v) {
                 boolean isUpdated = myDb.updateData(
@@ -94,33 +95,30 @@ public class SignupActivity extends AppCompatActivity {
                         surname.getText().toString(),
                         email.getText().toString(),
                         etPhone.getText().toString());
-                if (isUpdated == true) {
-                    Toast.makeText(SignupActivity.this, "Data Updated", Toast.LENGTH_LONG).show();
+                if (isUpdated) {
+                    Toast.makeText(getActivity(), "Data Updated", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(SignupActivity.this, "Data Not Updated", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Data Not Updated", Toast.LENGTH_LONG).show();
                 }
             }
-
         });
 
-        btnDelete = findViewById(R.id.btnDelete);
         btnDelete.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 if (myDb.deleteData(etId.getText().toString()) > 0) {
-                    Toast.makeText(SignupActivity.this, "Data Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Data Deleted", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(SignupActivity.this, "Data Not Deleted", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "Data Not Deleted", Toast.LENGTH_LONG).show();
                 }
-
             }
         });
+
+        return view;
     }
 
-
     public void showData(String title, String message) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
         builder.setTitle(title);
         builder.setMessage(message);

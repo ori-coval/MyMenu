@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.mymenu.SignUpSignIn.SignUpSignInActivity;
+
 public class MainActivity extends AppCompatActivity {
 
     Intent signUp, viewName, about;
@@ -24,11 +26,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnSignUp = findViewById(R.id.btnSignUp);
+        btnSignUp = findViewById(R.id.btnSignUpSignIn);
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signUp = new Intent(MainActivity.this, SignupActivity.class);
+                signUp = new Intent(MainActivity.this, SignUpSignInActivity.class);
                 startActivity(signUp);
             }
         });

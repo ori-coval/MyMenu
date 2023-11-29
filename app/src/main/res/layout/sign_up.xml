@@ -13,62 +13,63 @@
             android:layout_marginTop="30dp"
             android:text="Please enter details below"
             android:textColor="@color/black"
-            android:textSize="30dp" />
-
-        <EditText
-            android:id="@+id/etName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/design_default_color_secondary"
-            android:ems="10"
-            android:hint="First Name"
-            android:textSize="30dp" />
-
-        <EditText
-            android:id="@+id/etSure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/design_default_color_secondary"
-            android:ems="10"
-            android:hint="last name"
-            android:textSize="30dp" />
-
-        <EditText
-            android:id="@+id/etMail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/design_default_color_secondary"
-            android:ems="10"
-            android:hint="Email"
-            android:textSize="30dp" />
-
-        <EditText
-            android:id="@+id/etPhone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="@color/white"
-            android:textColorHint="@color/design_default_color_secondary"
-            android:ems="10"
-            android:hint="Phone Number"
-            android:textSize="30dp" />
+            android:textSize="30dp"/>
 
         <EditText
             android:id="@+id/etId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:textColor="@color/white"
             android:textColorHint="@color/design_default_color_secondary"
             android:ems="10"
             android:hint="id"
-            android:textSize="30dp" />
+            android:textSize="20dp"
+            android:inputType="number"/>
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/design_default_color_secondary"
+            android:ems="10"
+            android:hint="First Name"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/etSure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/design_default_color_secondary"
+            android:ems="10"
+            android:hint="last name"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/etMail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/design_default_color_secondary"
+            android:ems="10"
+            android:hint="Email"
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="@color/white"
+            android:textColorHint="@color/design_default_color_secondary"
+            android:ems="10"
+            android:hint="Phone Number"
+            android:textSize="20dp" />
 
         <LinearLayout
             android:layout_width="match_parent"

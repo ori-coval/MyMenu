@@ -62,6 +62,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    public boolean isAccountExist(String id, String email) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COL_ID + " = ? AND " + COL_EMAIL + " = ?", new String[]{id, email});
+
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
+
     public boolean updateData(String id, String name, String surname, String email, String phone){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -69,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL_NAME, name);
         contentValues.put(COL_SURNAME, surname);
         contentValues.put(COL_EMAIL, email);
-        contentValues.put(COL_PHONE, email);
+        contentValues.put(COL_PHONE, phone);
         db.update(TABLE_NAME, contentValues, "ID = ?", new String[] {id});
         return true;
     }
@@ -77,4 +86,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_NAME, "ID = ?", new String[] {id});
     }
+
+
 }

@@ -25,13 +25,13 @@
         android:textSize="40dp" />
 
     <Button
-        android:id="@+id/btnSignUp"
+        android:id="@+id/btnSignUpSignIn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="10dp"
         android:onClick="onClick"
-        android:text="Sign Up"
+        android:text="Sign Up/sign in"
         android:textSize="35dp" />
 
     <Button
@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="10dp"
         android:onClick="onClick"
         android:text="Search By Name"
         android:textSize="35dp" />
@@ -49,7 +49,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="10dp"
         android:onClick="onClick"
         android:text="About"
         android:textSize="35dp" />

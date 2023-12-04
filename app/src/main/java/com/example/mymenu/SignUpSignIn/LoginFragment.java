@@ -1,5 +1,6 @@
 package com.example.mymenu.SignUpSignIn;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,6 +18,8 @@ public class LoginFragment extends Fragment {
     private DatabaseHelper myDb;
     private EditText userIdEditText, emailEditText;
     private Button loginButton;
+
+    private Intent loginConfirm;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,6 +43,8 @@ public class LoginFragment extends Fragment {
                 // Check if ID and email are not empty
                 if (!userId.isEmpty() && !email.isEmpty() && myDb.isAccountExist(userId.toString(), email.toString())) {
                     Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
+                    loginConfirm = new Intent(getContext(), LoginConfim.class);
+                    startActivity(loginConfirm);
                 } else {
                     // Show an error message if ID or email is empty
                     Toast.makeText(getActivity(), "Please enter ID and email", Toast.LENGTH_SHORT).show();

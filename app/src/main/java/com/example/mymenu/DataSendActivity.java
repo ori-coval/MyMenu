@@ -66,7 +66,7 @@ public class DataSendActivity extends AppCompatActivity {
                 //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
+                // for ActivityCompat#requestPermissions for mored details.
                 return;
             }
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);

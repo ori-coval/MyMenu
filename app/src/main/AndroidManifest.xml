@@ -51,6 +51,8 @@
         <activity
             android:name=".SignUpSignIn.SignUpSignInActivity"
             android:exported="false" />
+        <activity android:name=".DeviceListActivity"
+            android:exported="false"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

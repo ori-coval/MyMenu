@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         btnSignUp = findViewById(R.id.btnSignUpSignIn);
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         btnAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                about = new Intent(MainActivity.this, DeviceListActivity.class);
+                about = new Intent(MainActivity.this, DataSendActivity.class);
                 startActivity(about);
             }
         });

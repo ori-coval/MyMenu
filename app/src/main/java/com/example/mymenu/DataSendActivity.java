@@ -1,5 +1,6 @@
 package com.example.mymenu;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -52,6 +53,7 @@ public class DataSendActivity extends AppCompatActivity {
     AcceptThread acceptThread;
     ConnectThread connectThread;
     ConnectedThread connectedThread;
+    static BluetoothSocket socket;
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_CONNECT_DEVICE_SECURE = 2;
@@ -97,11 +99,21 @@ public class DataSendActivity extends AppCompatActivity {
                 acceptThread.run();
             }
         });
+
+        sendFileButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                connectedThread = new ConnectedThread(socket);
+                connectedThread.run();
+
+            }
+        });
+
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                connectedThread = new ConnectedThread(connectThread.mmSocket);
-                connectedThread.run();
+                connectedThread = new ConnectedThread(socket);
                 connectedThread.write(sendText.getText().toString().getBytes());
             }
         });
@@ -202,6 +214,7 @@ public class DataSendActivity extends AppCompatActivity {
 
     private class AcceptThread extends Thread {
         private BluetoothServerSocket mmServerSocket;
+        public BluetoothSocket socket;
 
         public AcceptThread() {
             // Use a temporary object that is later assigned to mmServerSocket
@@ -226,11 +239,12 @@ public class DataSendActivity extends AppCompatActivity {
         }
 
         public void run() {
-            BluetoothSocket socket = null;
+            socket = null;
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
                     socket = mmServerSocket.accept();
+                    DataSendActivity.socket = socket;
                 } catch (IOException e) {
                     break;
                 }
@@ -259,7 +273,7 @@ public class DataSendActivity extends AppCompatActivity {
     }
 
     private class ConnectThread extends Thread {
-        private BluetoothSocket mmSocket;
+        public BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
         public ConnectThread(BluetoothDevice device) {
@@ -305,6 +319,11 @@ public class DataSendActivity extends AppCompatActivity {
                 // Connect to the remote device through the socket. This call blocks
                 // until it succeeds or throws an exception.
                 mmSocket.connect();
+
+                DataSendActivity.socket = mmSocket;
+                Toast.makeText(DataSendActivity.this, mmSocket.isConnected() ? "Connected" : "Not Connected",
+                        Toast.LENGTH_SHORT).show();
+
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and return.
                 try {
@@ -328,7 +347,7 @@ public class DataSendActivity extends AppCompatActivity {
         }
     }
 
-    private Handler handler; // handler that gets info from Bluetooth service
+    private Handler handler = new Handler(); // handler that gets info from Bluetooth service
 
     // Defines several constants used when transmitting messages between the
     // service and the UI.
@@ -366,6 +385,7 @@ public class DataSendActivity extends AppCompatActivity {
             mmOutStream = tmpOut;
         }
 
+        @SuppressLint("SetTextI18n")
         public void run() {
             mmBuffer = new byte[1024];
             int numBytes; // bytes returned from read()
@@ -376,11 +396,14 @@ public class DataSendActivity extends AppCompatActivity {
                     // Read from the InputStream.
                     numBytes = mmInStream.read(mmBuffer);
                     // Send the obtained bytes to the UI activity.
+
+
                     Message readMsg = handler.obtainMessage(
                             MessageConstants.MESSAGE_READ, numBytes, -1,
-                            mmBuffer);
+                           mmBuffer);
                     readMsg.sendToTarget();
-                    reciveText.setText(readMsg.toString());
+                    reciveText.setText("Recived: " + new String(mmBuffer, 0, numBytes));
+                    cancel();
                 } catch (IOException e) {
                     break;
                 }

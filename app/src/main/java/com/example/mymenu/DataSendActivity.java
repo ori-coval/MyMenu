@@ -1,31 +1,23 @@
 package com.example.mymenu;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -38,15 +30,12 @@ import java.util.UUID;
 public class DataSendActivity extends AppCompatActivity {
 
 
-    private Button selectFileButton;
-    private Button viaBluetoothButton;
-    private Button viaNfcButton;
-    private Button sendFileButton;
-    private Button cancelButton;
-    private ProgressBar progressBar;
-    private TextView reciveText;
-    private EditText sendText;
-    Context context;
+    Button btnConnect;
+    Button btnStartConnection;
+    Button btnReceiveText;
+    Button btnSendText;
+    private TextView tvReceiveText;
+    private EditText etTextToSend;
 
     BluetoothAdapter bluetoothAdapter;
 
@@ -56,7 +45,7 @@ public class DataSendActivity extends AppCompatActivity {
     static BluetoothSocket socket;
 
     private static final int REQUEST_ENABLE_BT = 1;
-    private static final int REQUEST_CONNECT_DEVICE_SECURE = 2;
+    private static final int REQUEST_CONNECT_DEVICE = 2;
     private static final UUID MY_UUID =
             UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
 
@@ -71,124 +60,70 @@ public class DataSendActivity extends AppCompatActivity {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Initialize UI elements
-        selectFileButton = findViewById(R.id.select_file_button);
-        viaBluetoothButton = findViewById(R.id.via_bluetooth_button);
-        viaNfcButton = findViewById(R.id.via_nfc_button);
-        sendFileButton = findViewById(R.id.send_file_button);
-        cancelButton = findViewById(R.id.cancel_button);
-        progressBar = findViewById(R.id.progress_bar);
-        reciveText = findViewById(R.id.TVReciveText);
-        sendText = findViewById(R.id.ETSend);
+        btnConnect = findViewById(R.id.btnConnectToOthers);
+        btnStartConnection = findViewById(R.id.btnAllowConnection);
+        btnReceiveText = findViewById(R.id.btnEnableSending);
+        btnSendText = findViewById(R.id.btnSendText);
+        tvReceiveText = findViewById(R.id.tvReciveText);
+        etTextToSend = findViewById(R.id.etSend);
+
+        askPermission();
         enableBluetooth();
         ensureDiscoverable();
-
-        viaBluetoothButton.setOnClickListener(new View.OnClickListener() {
+        btnConnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: Implement Bluetooth recipient selection
-                // Launch the DeviceListActivity to see devices and do scan
                 Intent serverIntent = new Intent(DataSendActivity.this, DeviceListActivity.class);
-                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
             }
         });
 
-        viaNfcButton.setOnClickListener(new View.OnClickListener() {
+        btnStartConnection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 acceptThread = new AcceptThread();
-                acceptThread.run();
+                acceptThread.start();
             }
         });
 
-        sendFileButton.setOnClickListener(new View.OnClickListener() {
-
+        btnSendText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 connectedThread = new ConnectedThread(socket);
-                connectedThread.run();
-
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                connectedThread = new ConnectedThread(socket);
-                connectedThread.write(sendText.getText().toString().getBytes());
+                connectedThread.start();
+                connectedThread.write(etTextToSend.getText().toString().getBytes());
             }
         });
     }
 
-    /**
-     * Makes this device discoverable for 300 seconds (5 minutes).
-     */
-    private void ensureDiscoverable() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        if (bluetoothAdapter.getScanMode() !=
-                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivity(discoverableIntent);
-        }
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
-                if (resultCode == Activity.RESULT_OK) {
-                    // Bluetooth is now enabled, so set up a chat session
-                } else {
+                if (resultCode != Activity.RESULT_OK) {
                     // User did not enable Bluetooth or an error occurred
-                    if (this != null) {
                         Toast.makeText(this, R.string.bt_not_enabled_leaving,
                                 Toast.LENGTH_SHORT).show();
                         this.finish();
-                    }
                 }
-            case REQUEST_CONNECT_DEVICE_SECURE:
+                break;
+            case REQUEST_CONNECT_DEVICE:
                 if (resultCode == Activity.RESULT_OK) {
-                    connectDevice(data, true);
+                    connectDevice(data);
                 }
                 break;
         }
     }
 
-    private void enableBluetooth() {
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BT);
-        }
-
-    }
 
     /**
      * Establish connection with other device
      *
      * @param data   An {@link Intent} with {@link DeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    private void connectDevice(Intent data, boolean secure) {
+    private void connectDevice(Intent data) {
         // Get the device MAC address
         Bundle extras = data.getExtras();
         if (extras == null) {
@@ -198,18 +133,17 @@ public class DataSendActivity extends AppCompatActivity {
         // Get the BluetoothDevice object
         BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
         // Attempt to connect to the device
-        connect(device, secure);
+        connect(device);
     }
 
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
      *
      * @param device The BluetoothDevice to connect
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
      */
-    public synchronized void connect(BluetoothDevice device, boolean secure) {
+    public synchronized void connect(BluetoothDevice device) {
         connectThread =new ConnectThread(device);
-        connectThread.run();
+        connectThread.start();
     }
 
     private class AcceptThread extends Thread {
@@ -223,14 +157,7 @@ public class DataSendActivity extends AppCompatActivity {
             try {
                 // MY_UUID is the app's UUID string, also used by the client code.
                 if (ActivityCompat.checkSelfPermission(DataSendActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
+                    askPermission();
                 }
                 tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
             } catch (IOException e) {
@@ -286,14 +213,7 @@ public class DataSendActivity extends AppCompatActivity {
                 // Get a BluetoothSocket to connect with the given BluetoothDevice.
                 // MY_UUID is the app's UUID string, also used in the server code.
                 if (ActivityCompat.checkSelfPermission(DataSendActivity.this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
+                    askPermission();
                 }
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) {
@@ -304,14 +224,7 @@ public class DataSendActivity extends AppCompatActivity {
         public void run() {
             // Cancel discovery because it otherwise slows down the connection.
             if (ActivityCompat.checkSelfPermission(DataSendActivity.this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
+                askPermission();
             }
             bluetoothAdapter.cancelDiscovery();
 
@@ -321,8 +234,7 @@ public class DataSendActivity extends AppCompatActivity {
                 mmSocket.connect();
 
                 DataSendActivity.socket = mmSocket;
-                Toast.makeText(DataSendActivity.this, mmSocket.isConnected() ? "Connected" : "Not Connected",
-                        Toast.LENGTH_SHORT).show();
+
 
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and return.
@@ -330,7 +242,6 @@ public class DataSendActivity extends AppCompatActivity {
                     mmSocket.close();
                 } catch (IOException closeException) {
                 }
-                return;
             }
 
             // The connection attempt succeeded. Perform work associated with
@@ -402,8 +313,7 @@ public class DataSendActivity extends AppCompatActivity {
                             MessageConstants.MESSAGE_READ, numBytes, -1,
                            mmBuffer);
                     readMsg.sendToTarget();
-                    reciveText.setText("Recived: " + new String(mmBuffer, 0, numBytes));
-                    cancel();
+                    tvReceiveText.setText("Received: " + new String(mmBuffer, 0, numBytes));
                 } catch (IOException e) {
                     break;
                 }
@@ -437,6 +347,43 @@ public class DataSendActivity extends AppCompatActivity {
             try {
                 mmSocket.close();
             } catch (IOException e) {
+            }
+        }
+    }
+
+    /**
+     * Makes this device discoverable for 300 seconds (5 minutes).
+     */
+    private void ensureDiscoverable() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            askPermission();
+        }
+//        if (bluetoothAdapter.getScanMode() !=
+//                BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+        if(true){
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivity(discoverableIntent);
+        }
+    }
+    private void enableBluetooth() {
+        if (!bluetoothAdapter.isEnabled()) {
+
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                askPermission();
+            }
+            Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BT);
+            return;
+        }
+    }
+
+    public void askPermission(){
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN}, 1);
+            try {
+                wait(750);
+            } catch (InterruptedException e) {
             }
         }
     }

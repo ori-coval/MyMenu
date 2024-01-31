@@ -35,8 +35,6 @@ import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
 
-import com.example.mymenu.Logger.Log;
-
 import java.util.Set;
 
 /**
@@ -166,7 +164,6 @@ public class DeviceListActivity extends Activity {
      * Start device discover with the BluetoothAdapter
      */
     private void doDiscovery() {
-        Log.d(TAG, "doDiscovery()");
 
         // Indicate scanning in the title
         setProgressBarIndeterminateVisibility(true);
